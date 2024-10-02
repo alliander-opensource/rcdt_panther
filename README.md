@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Alliander N. V.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-# RCDT Linting
+# RCDT Panther
 
 This repository contains code for use with the Husarion Panther by [Husarion](https://husarion.com).
 It is intended to be used alongside the other repositories in [RCDT robotics](https://github.com/alliander-opensource/rcdt_robotics).
