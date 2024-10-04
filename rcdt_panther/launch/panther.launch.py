@@ -45,6 +45,11 @@ def launch_setup(context: LaunchContext) -> None:
         launch_arguments={"rviz_frame": "odom"}.items(),
     )
 
+    gamepad = Node(
+        package="rcdt_utilities",
+        executable="gamepad_node.py",
+    )
+
     skip = LaunchDescriptionEntity()
     return [
         SetParameter(name="use_sim_time", value=True),
@@ -53,6 +58,7 @@ def launch_setup(context: LaunchContext) -> None:
         joint_state_broadcaster,
         controllers,
         rviz if run_rviz_arg.value(context) else skip,
+        gamepad,
     ]
 
 
