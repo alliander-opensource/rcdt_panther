@@ -1,0 +1,7 @@
+axes:
+  1:
+    linear:
+      direction: "x"
+  2:
+    angular:
+      direction: "z"
