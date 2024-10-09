@@ -45,9 +45,21 @@ def launch_setup(context: LaunchContext) -> None:
         launch_arguments={"rviz_frame": "odom"}.items(),
     )
 
-    gamepad = Node(
+    joy = Node(
+        package="joy",
+        executable="game_controller_node",
+        parameters=[
+            {"sticky_buttons": True},
+        ],
+    )
+
+    joy_to_twist_node = Node(
         package="rcdt_utilities",
-        executable="gamepad_node.py",
+        executable="joy_to_twist_node.py",
+        parameters=[
+            {"pub_topic": "/diff_drive_controller/cmd_vel"},
+            {"config_pkg": "rcdt_panther"},
+        ],
     )
 
     skip = LaunchDescriptionEntity()
@@ -58,7 +70,8 @@ def launch_setup(context: LaunchContext) -> None:
         joint_state_broadcaster,
         controllers,
         rviz if run_rviz_arg.value(context) else skip,
-        gamepad,
+        joy,
+        joy_to_twist_node,
     ]
 
 
