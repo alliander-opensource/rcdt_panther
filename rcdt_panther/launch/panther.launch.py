@@ -30,6 +30,13 @@ def launch_setup(context: LaunchContext) -> None:
         get_file_path("rcdt_utilities", ["launch"], "gazebo_robot.launch.py")
     )
 
+    static_transform_publisher = Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        name="static_tf_world",
+        arguments=["--frame-id", "world", "--child-frame-id", "odom"],
+    )
+
     joint_state_broadcaster = Node(
         package="controller_manager",
         executable="spawner",
@@ -41,8 +48,7 @@ def launch_setup(context: LaunchContext) -> None:
     )
 
     rviz = IncludeLaunchDescription(
-        get_file_path("rcdt_utilities", ["launch"], "rviz.launch.py"),
-        launch_arguments={"rviz_frame": "odom"}.items(),
+        get_file_path("rcdt_utilities", ["launch"], "rviz.launch.py")
     )
 
     joy = Node(
@@ -67,6 +73,7 @@ def launch_setup(context: LaunchContext) -> None:
         SetParameter(name="use_sim_time", value=True),
         robot_state_publisher,
         robot,
+        static_transform_publisher,
         joint_state_broadcaster,
         controllers,
         rviz if run_rviz_arg.value(context) else skip,
