@@ -12,10 +12,12 @@ from rcdt_utilities.launch_utils import (
     LaunchArgument,
 )
 
-run_rviz_arg = LaunchArgument("rviz", False, [True, False])
+use_rviz_arg = LaunchArgument("rviz", False, [True, False])
 
 
 def launch_setup(context: LaunchContext) -> None:
+    use_rviz = use_rviz_arg.value(context)
+
     xacro_path = get_file_path("panther_description", ["urdf"], "panther.urdf.xacro")
     xacro_arguments = {"use_sim": "true"}
     robot_description = get_robot_description(xacro_path, xacro_arguments)
@@ -30,6 +32,13 @@ def launch_setup(context: LaunchContext) -> None:
         get_file_path("rcdt_utilities", ["launch"], "gazebo_robot.launch.py")
     )
 
+    static_transform_publisher = Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        name="static_tf_world",
+        arguments=["--frame-id", "world", "--child-frame-id", "odom"],
+    )
+
     joint_state_broadcaster = Node(
         package="controller_manager",
         executable="spawner",
@@ -41,8 +50,7 @@ def launch_setup(context: LaunchContext) -> None:
     )
 
     rviz = IncludeLaunchDescription(
-        get_file_path("rcdt_utilities", ["launch"], "rviz.launch.py"),
-        launch_arguments={"rviz_frame": "odom"}.items(),
+        get_file_path("rcdt_utilities", ["launch"], "rviz.launch.py")
     )
 
     joy = Node(
@@ -67,9 +75,10 @@ def launch_setup(context: LaunchContext) -> None:
         SetParameter(name="use_sim_time", value=True),
         robot_state_publisher,
         robot,
+        static_transform_publisher,
         joint_state_broadcaster,
         controllers,
-        rviz if run_rviz_arg.value(context) else skip,
+        rviz if use_rviz else skip,
         joy,
         joy_to_twist_node,
     ]
@@ -78,7 +87,7 @@ def launch_setup(context: LaunchContext) -> None:
 def generate_launch_description() -> LaunchDescription:
     return LaunchDescription(
         [
-            run_rviz_arg.declaration,
+            use_rviz_arg.declaration,
             OpaqueFunction(function=launch_setup),
         ]
     )
