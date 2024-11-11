@@ -12,10 +12,12 @@ from rcdt_utilities.launch_utils import (
     LaunchArgument,
 )
 
-run_rviz_arg = LaunchArgument("rviz", False, [True, False])
+use_rviz_arg = LaunchArgument("rviz", False, [True, False])
 
 
 def launch_setup(context: LaunchContext) -> None:
+    use_rviz = use_rviz_arg.value(context)
+
     xacro_path = get_file_path("panther_description", ["urdf"], "panther.urdf.xacro")
     xacro_arguments = {"use_sim": "true"}
     robot_description = get_robot_description(xacro_path, xacro_arguments)
@@ -76,7 +78,7 @@ def launch_setup(context: LaunchContext) -> None:
         static_transform_publisher,
         joint_state_broadcaster,
         controllers,
-        rviz if run_rviz_arg.value(context) else skip,
+        rviz if use_rviz else skip,
         joy,
         joy_to_twist_node,
     ]
@@ -85,7 +87,7 @@ def launch_setup(context: LaunchContext) -> None:
 def generate_launch_description() -> LaunchDescription:
     return LaunchDescription(
         [
-            run_rviz_arg.declaration,
+            use_rviz_arg.declaration,
             OpaqueFunction(function=launch_setup),
         ]
     )
